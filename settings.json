@@ -1,8 +1,10 @@
 [
   {
     "name": "teststream",
-    "source_path": "/Users/max/projects/src/github.com/maxim-kuderko/file-listener/",
-    "source_regex": ".*\\.log",
-    "destination": "s3://max-logs-test/test-stream/"
+    "source_path": "/Users/max/projects/src/github.com/maxim-kuderko/file-listener/example/",
+    "source_regex": "log-stream\\.log",
+    "destination": "s3://max-logger-test/test-stream/",
+    "destination_region": "us-east-1",
+    "listen_interval": 10
   }
 ]
