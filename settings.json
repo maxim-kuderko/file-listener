@@ -3,7 +3,6 @@
     "source_path": "/home/max/Projects/src/github.com/maxim-kuderko/file-listener/example/",
     "source_regex": "log-stream-.*",
     "destination": "s3://max-logger-test/test-stream/",
-    "destination_region": "us-east-1",
-    "listen_interval": 1
+    "destination_region": "us-east-1"
   }
 ]
