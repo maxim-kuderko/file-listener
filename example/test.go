@@ -7,9 +7,10 @@ import (
 )
 
 func main() {
+	log.SetFlags(0)
 	log.SetOutput(&lumberjack.Logger{
-		Filename:   "/Users/max/projects/src/github.com/maxim-kuderko/file-listener/example/log-stream.log",
-		MaxSize:    1, // megabytes
+		Filename:   "/home/max/Projects/src/github.com/maxim-kuderko/file-listener/example/log-stream.log",
+		MaxSize:    10, // megabytes
 		MaxBackups: 300,
 		MaxAge:     28,    //days
 		Compress:   false, // disabled by default

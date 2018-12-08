@@ -9,20 +9,15 @@ import (
 	"log"
 	"net/url"
 	"os"
-	"os/signal"
 	"regexp"
 	"strconv"
 	"sync"
-	"syscall"
 	"time"
 )
 
 var uploading = sync.Map{}
 
 func main() {
-	sigs := make(chan os.Signal, 1)
-	done := make(chan bool, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	// load settings
 	settings := readSettings()
 	// per folder listen to files
@@ -35,8 +30,8 @@ func main() {
 		go printErrors(errors)
 		go deleteFiles(filesToDelete)
 	}
+	done := make(chan bool, 1)
 	<-done
-	//wg.Wait()
 }
 
 type setting struct {
@@ -113,7 +108,7 @@ func uploadFiles(st setting, files <-chan File) (<-chan File, <-chan error) {
 		upd := s3manager.NewUploader(sess)
 		pool, err := strconv.Atoi(os.Getenv(`UPLOAD_CONCURRENCY`))
 		if err != nil {
-			panic(err)
+			pool = 50
 		}
 		sem := make(chan bool, pool)
 		wg := sync.WaitGroup{}
