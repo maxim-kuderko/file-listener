@@ -122,12 +122,12 @@ func uploadFiles(st setting, files <-chan File) (<-chan File, <-chan error) {
 			panic(err)
 		}
 		for f := range files {
-			sem <- true
-			wg.Add(1)
 			_, loaded := uploading.LoadOrStore(f.Path+f.Name, 1)
 			if !loaded {
 				continue
 			}
+			sem <- true
+			wg.Add(1)
 			go func(f File) {
 				defer func() {
 					wg.Done()
