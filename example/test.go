@@ -1,15 +1,20 @@
 package main
 
 import (
-	"os"
+	"gopkg.in/natefinch/lumberjack.v2"
+	"log"
 	"strconv"
-	"time"
 )
 
 func main() {
-	f, _ := os.OpenFile("/Users/max/projects/src/github.com/maxim-kuderko/file-listener/example/log-stream.log", os.O_APPEND|os.O_WRONLY, 0600)
+	log.SetOutput(&lumberjack.Logger{
+		Filename:   "/Users/max/projects/src/github.com/maxim-kuderko/file-listener/example/log-stream.log",
+		MaxSize:    1, // megabytes
+		MaxBackups: 300,
+		MaxAge:     28,    //days
+		Compress:   false, // disabled by default
+	})
 	for i := 0; i < 100000000; i++ {
-		f.WriteString("{\"key\": \"" + strconv.Itoa(i) + "\"}\n")
-		time.Sleep(time.Millisecond * 10)
+		log.Println("{\"key\": \"" + strconv.Itoa(i) + "\"}")
 	}
 }

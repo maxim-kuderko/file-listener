@@ -25,21 +25,13 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	// load settings
 	settings := readSettings()
-	//wg := sync.WaitGroup{}
 	// per folder listen to files
 	for _, setting := range settings {
 		// listen to files
-		rawFiles, errors := listenToFiles(setting.SourcePath, setting.SourceRegex, setting.ListenInterval)
-		go printErrors(errors)
-		// lock files
-		lockedPath := setting.SourcePath + setting.Name + `/`
-		os.Mkdir(lockedPath, os.ModePerm)
-		errors = lockFiles(lockedPath, rawFiles)
+		rawFiles, errors := listenToFiles(setting.SourcePath, setting.SourceRegex, 1)
 		go printErrors(errors)
 		// listen to locked files
-		lockedFiles, errors := listenToFiles(lockedPath, `.*`, 1)
-		// upload files
-		filesToDelete, errors := uploadFiles(setting, lockedFiles)
+		filesToDelete, errors := uploadFiles(setting, rawFiles)
 		go printErrors(errors)
 		go deleteFiles(filesToDelete)
 	}
@@ -48,12 +40,10 @@ func main() {
 }
 
 type setting struct {
-	Name              string `json:"name"`
 	SourcePath        string `json:"source_path"`
 	SourceRegex       string `json:"source_regex"`
 	Destination       string `json:"destination"`
 	DestinationRegion string `json:"destination_region"`
-	ListenInterval    int    `json:"listen_interval"`
 }
 
 type File struct {
@@ -111,18 +101,6 @@ func listenToFiles(path, rx string, listenInterval int) (<-chan File, <-chan err
 		}
 	}()
 	return output, errors
-}
-
-func lockFiles(lockedPath string, files <-chan File) <-chan error {
-	errors := make(chan error)
-	go func() {
-		for f := range files {
-			if err := os.Rename(f.Path+f.Name, lockedPath+f.LastUpdated.Format(time.RFC3339)+f.Name); err != nil {
-				errors <- err
-			}
-		}
-	}()
-	return errors
 }
 
 func uploadFiles(st setting, files <-chan File) (<-chan File, <-chan error) {
