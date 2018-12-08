@@ -160,6 +160,8 @@ func uploadFiles(st setting, files <-chan File) (<-chan File, <-chan error) {
 func deleteFiles(files <-chan File) {
 	for f := range files {
 		log.Println(`removing file`, f)
-		os.Remove(f.Path + f.Name)
+		if err := os.Remove(f.Path + f.Name); err != nil {
+			log.Println(err)
+		}
 	}
 }
